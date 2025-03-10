@@ -17,7 +17,7 @@ describe('GET /api', () => {
 				expect(endpoints).toEqual(endpointsJson);
 			});
 	});
-	test.only('200: Responds with an array of all topics', () => {
+	test('200: Responds with an array of all topics', () => {
 		return request(app)
 			.get('/api/topics')
 			.expect(200)
@@ -50,6 +50,57 @@ describe('GET /api', () => {
 						img_url: '',
 					},
 				]);
+			});
+	});
+	test('200: Get articles by article_id', () => {
+		return request(app)
+			.get('/api/articles/3')
+			.expect(200)
+			.then(({ body: { article } }) => {
+				expect(article).toBeInstanceOf(Object);
+				expect(article).toEqual(
+					expect.objectContaining({
+						author: expect.any(String),
+						title: expect.any(String),
+						article_id: expect.any(Number),
+						body: expect.any(String),
+						topic: expect.any(String),
+						votes: expect.any(Number),
+						article_img_url: expect.any(String),
+					})
+				);
+				expect(article.created_at).toMatch(
+					/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+				);
+
+				expect(article).toEqual({
+					article_id: 3,
+					title: 'Eight pug gifs that remind me of mitch',
+					topic: 'mitch',
+					author: 'icellusedkars',
+					body: 'some gifs',
+					created_at: '2020-11-03T09:12:00.000Z',
+					votes: 0,
+					article_img_url:
+						'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+				});
+			});
+	});
+	test('404: responds with an error when article_id does not exist', () => {
+		return request(app)
+			.get('/api/articles/9999')
+			.expect(404)
+			.then(({ body }) => {
+				console.log('body msg from test', body.msg);
+				expect(body.msg).toBe('Article Not Found');
+			});
+	});
+	test('400: responds with an error for invalid article_id (not a number)', () => {
+		return request(app)
+			.get('/api/articles/bananas')
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe('Invalid Article ID');
 			});
 	});
 });
