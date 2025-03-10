@@ -1,5 +1,5 @@
 const endpoints = require('../endpoints.json');
-const { fetchAllTopics } = require('../model/get.model.js');
+const { fetchAllTopics, fetchArticleById } = require('../model/get.model.js');
 
 exports.getEndpoints = (request, response) => {
 	return response.status(200).send({ endpoints });
@@ -14,4 +14,21 @@ exports.getAllTopics = (request, response) => {
 			response.status(500).send({ msg: 'Internal Server Error' });
 		}
 	});
+};
+
+exports.getArticleById = (request, response, next) => {
+	const { article_id } = request.params;
+	if (isNaN(article_id)) {
+		return next({
+			status: 400,
+			msg: 'Invalid Article ID',
+		});
+	}
+	fetchArticleById(article_id)
+		.then((article) => {
+			response.status(200).send({ article });
+		})
+		.catch((err) => {
+			next(err);
+		});
 };
