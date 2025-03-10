@@ -6,8 +6,8 @@ exports.getEndpoints = (request, response) => {
 	return response.status(200).send({ endpoints });
 };
 
-exports.getAllTopics(request, response) {
-	fetchAllTopics().then((topics) => {
-		response.status(200).send({topics: topics});
-	});
-}
+// exports.getAllTopics(request, response) {
+// 	fetchAllTopics().then((topics) => {
+// 		response.status(200).send({topics: topics});
+// 	});
+// }
