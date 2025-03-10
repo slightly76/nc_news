@@ -1,13 +1,17 @@
 const endpoints = require('../endpoints.json');
-const { fetchEndpoints } = require('../model/get.model.js');
+const { fetchAllTopics } = require('../model/get.model.js');
 
 exports.getEndpoints = (request, response) => {
-	console.log('endpoints from controller', endpoints);
 	return response.status(200).send({ endpoints });
 };
 
-// exports.getAllTopics(request, response) {
-// 	fetchAllTopics().then((topics) => {
-// 		response.status(200).send({topics: topics});
-// 	});
-// }
+exports.getAllTopics = (request, response) => {
+	const { description, slug, img_url } = request.query;
+	fetchAllTopics(description, slug, img_url).then((topics) => {
+		try {
+			response.status(200).send({ topics: topics });
+		} catch {
+			response.status(500).send({ msg: 'Internal Server Error' });
+		}
+	});
+};

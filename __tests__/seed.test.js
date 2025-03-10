@@ -448,11 +448,3 @@ describe('seed', () => {
 		});
 	});
 });
-
-// //db.query(`SELECT * FROM articles`).then(({ rows }) => {
-// 	console.log(rows);
-// });
-
-// //db.query(`SELECT * FROM comments`).then(({ rows }) => {
-// 	console.log(rows);
-// });
