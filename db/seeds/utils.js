@@ -76,7 +76,6 @@ async function injectComments(data) {
 			return [article_id, body, votes, author, created_at];
 		}
 	);
-	//console.log('commentValues >>>>', commentValues);
 	const queryString = format(
 		`
 		INSERT INTO comments (article_id, body, votes, author, created_at)
@@ -85,7 +84,6 @@ async function injectComments(data) {
 		commentValues
 	);
 	const { rows } = await db.query(queryString);
-	//console.log('returning rows >>>', rows);
 	return rows;
 }
 
