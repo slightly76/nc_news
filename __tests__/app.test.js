@@ -17,4 +17,12 @@ describe('GET /api', () => {
 				expect(endpoints).toEqual(endpointsJson);
 			});
 	});
+	// test('200: Responds with an array ', () => {
+	// 	return request(app)
+	// 		.get('/api')
+	// 		.expect(200)
+	// 		.then(({ body: { endpoints } }) => {
+	// 			expect(endpoints).toEqual(endpointsJson);
+	// 		});
+	// });
 });
