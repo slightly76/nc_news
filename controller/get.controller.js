@@ -4,6 +4,7 @@ const {
 	fetchArticleById,
 	fetchArticlesSortedBy,
 	fetchCommentsByArticleId,
+	postArticleComment,
 } = require('../model/get.model.js');
 
 exports.getEndpoints = (request, response) => {
@@ -47,7 +48,40 @@ exports.getArticleComments = (request, response, next) => {
 	const { article_id } = request.params;
 	fetchCommentsByArticleId(article_id)
 		.then((comments) => {
+			if (comments.length === 0) {
+				return response.status(200).send({
+					msg: 'No Comments ... Yet!',
+					comments: [],
+				});
+			}
 			response.status(200).send({ comments });
+		})
+		.catch((err) => {
+			next(err);
+		});
+};
+
+exports.addArticleComment = (request, response, next) => {
+	const { article_id } = request.params;
+	const { body, author } = request.body;
+	if (isNaN(article_id)) {
+		return response
+			.status(400)
+			.send({ msg: 'Bad Request: article_id must be a number' });
+	}
+
+	postArticleComment(article_id, body, author)
+		.then((comment) => {
+			if (!comment || !comment.msg || !comment.comment) {
+				return response.status(500).send({
+					msg: 'Internal Server Error: Failed to post comment',
+				});
+			}
+
+			response.status(201).send({
+				msg: comment.msg,
+				comment: comment.comment,
+			});
 		})
 		.catch((err) => {
 			next(err);
