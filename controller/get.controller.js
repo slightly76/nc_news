@@ -3,26 +3,26 @@ const {
 	fetchAllTopics,
 	fetchArticleById,
 	fetchArticlesSortedBy,
+	fetchCommentsByArticleId,
 } = require('../model/get.model.js');
 
 exports.getEndpoints = (request, response) => {
 	return response.status(200).send({ endpoints });
 };
 
-exports.getAllTopics = (request, response, next) => {
+exports.getAllTopics = (request, response) => {
 	const { description, slug, img_url } = request.query;
-	fetchAllTopics(description, slug, img_url).then((topics) => {
-		try {
+	fetchAllTopics(description, slug, img_url)
+		.then((topics) => {
 			response.status(200).send({ topics: topics });
-		} catch {
+		})
+		.catch((err) => {
 			next(err);
-		}
-	});
+		});
 };
 
 exports.getArticleById = (request, response, next) => {
 	const { article_id } = request.params;
-
 	fetchArticleById(article_id)
 		.then((article) => {
 			response.status(200).send({ article });
@@ -37,6 +37,17 @@ exports.getArticlesSortedBy = (request, response, next) => {
 	fetchArticlesSortedBy(sort_by)
 		.then((articles) => {
 			response.status(200).send({ articles });
+		})
+		.catch((err) => {
+			next(err);
+		});
+};
+
+exports.getArticleComments = (request, response, next) => {
+	const { article_id } = request.params;
+	fetchCommentsByArticleId(article_id)
+		.then((comments) => {
+			response.status(200).send({ comments });
 		})
 		.catch((err) => {
 			next(err);

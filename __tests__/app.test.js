@@ -89,7 +89,7 @@ describe('GET /api', () => {
 			.get('/api/articles/bananas')
 			.expect(400)
 			.then(({ body }) => {
-				expect(body.msg).toBe('Invalid Article ID');
+				expect(body.msg).toBe('Invalid Input');
 			});
 	});
 	test('200: Get all articles, sorted by date in descending order', () => {
@@ -108,12 +108,13 @@ describe('GET /api', () => {
 							topic: expect.any(String),
 							votes: expect.any(Number),
 							article_img_url: expect.any(String),
-							comment_count: expect.any(String),
+							comment_count: expect.any(Number),
 						})
 					);
 					expect(article.created_at).toMatch(
 						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
 					);
+					expect(articles).not.toHaveProperty('body');
 					expect(articles).toBeSortedBy('created_at', { descending: true });
 				});
 			});
@@ -124,6 +125,48 @@ describe('GET /api', () => {
 			.expect(400)
 			.then(({ body }) => {
 				expect(body.msg).toBe('Invalid Sort Request');
+			});
+	});
+	test('200: Get all comments, sorted by created_at in descending order', () => {
+		return request(app)
+			.get('/api/articles/1/comments')
+			.expect(200)
+			.then(({ body: { comments } }) => {
+				expect(Array.isArray(comments)).toBe(true);
+				expect(comments).not.toHaveLength(0);
+				comments.forEach((comment) => {
+					expect(comment.article_id).toEqual(1);
+					expect(comment).toEqual(
+						expect.objectContaining({
+							comment_id: expect.any(Number),
+							votes: expect.any(Number),
+							author: expect.any(String),
+							body: expect.any(String),
+							article_id: expect.any(Number),
+						})
+					);
+					expect(comment.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+
+					expect(comments).toBeSortedBy('created_at', { descending: true });
+				});
+			});
+	});
+	test('404: responds with error if sort_by is invalid', () => {
+		return request(app)
+			.get('/api/articles/9999/comments')
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe('Article Not Found');
+			});
+	});
+	test('400: responds with an error for invalid article_id (not a number)', () => {
+		return request(app)
+			.get('/api/articles/bananas/comments')
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe('Invalid Input');
 			});
 	});
 });
