@@ -5,6 +5,7 @@ const {
 	getAllTopics,
 	getArticleById,
 	getArticlesSortedBy,
+	getArticleComments,
 } = require('./controller/get.controller.js');
 
 app.get('/api', getEndpoints);
@@ -14,6 +15,13 @@ app.get('/api/topics', getAllTopics);
 app.get('/api/articles/:article_id', getArticleById);
 
 app.get('/api/articles', getArticlesSortedBy);
+
+app.get('/api/articles/:article_id/comments', getArticleComments);
+
+exports.errorHandler = (err, request, result, next) => {
+	console.error(err);
+	result.status(500).send({ msg: 'Internal Server Error' });
+};
 
 app.use((err, request, response, next) => {
 	if (err.status) {
@@ -29,7 +37,7 @@ app.use((err, request, response, next) => {
 
 app.use((err, request, response, next) => {
 	console.log(err);
-	response.status(500).send({ msg: 'Internal Sausage Error' });
+	response.status(500).send({ msg: 'Internal Server Error' });
 });
 
 module.exports = app;
