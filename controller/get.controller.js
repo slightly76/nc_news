@@ -9,7 +9,7 @@ exports.getEndpoints = (request, response) => {
 	return response.status(200).send({ endpoints });
 };
 
-exports.getAllTopics = (request, response) => {
+exports.getAllTopics = (request, response, next) => {
 	const { description, slug, img_url } = request.query;
 	fetchAllTopics(description, slug, img_url).then((topics) => {
 		try {
@@ -33,11 +33,10 @@ exports.getArticleById = (request, response, next) => {
 };
 
 exports.getArticlesSortedBy = (request, response, next) => {
-	const { sortBy } = request.params;
-	console.log('sortBy from controller >>>', sortBy);
-	fetchArticlesSortedBy(sortedBy)
-		.then((article) => {
-			response.status(200).send({ article });
+	const { sort_by } = request.query;
+	fetchArticlesSortedBy(sort_by)
+		.then((articles) => {
+			response.status(200).send({ articles });
 		})
 		.catch((err) => {
 			next(err);

@@ -13,11 +13,11 @@ app.get('/api/topics', getAllTopics);
 
 app.get('/api/articles/:article_id', getArticleById);
 
-app.get('/api/articles?sort_by=created_at', getArticlesSortedBy);
+app.get('/api/articles', getArticlesSortedBy);
 
-app.use((err, request, result, next) => {
+app.use((err, request, response, next) => {
 	if (err.status) {
-		result.status(err.status).send({ msg: err.msg });
+		response.status(err.status).send({ msg: err.msg });
 	} else next(err);
 });
 
