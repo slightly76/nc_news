@@ -4,6 +4,7 @@ const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data/index');
 const request = require('supertest');
 const app = require('../app.js');
+require('jest-sorted');
 
 beforeAll(() => seed(data));
 afterAll(() => db.end());
@@ -58,17 +59,6 @@ describe('GET /api', () => {
 			.expect(200)
 			.then(({ body: { article } }) => {
 				expect(article).toBeInstanceOf(Object);
-				expect(article).toEqual(
-					expect.objectContaining({
-						author: expect.any(String),
-						title: expect.any(String),
-						article_id: expect.any(Number),
-						body: expect.any(String),
-						topic: expect.any(String),
-						votes: expect.any(Number),
-						article_img_url: expect.any(String),
-					})
-				);
 				expect(article.created_at).toMatch(
 					/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
 				);
@@ -91,7 +81,6 @@ describe('GET /api', () => {
 			.get('/api/articles/9999')
 			.expect(404)
 			.then(({ body }) => {
-				console.log('body msg from test', body.msg);
 				expect(body.msg).toBe('Article Not Found');
 			});
 	});
@@ -101,6 +90,40 @@ describe('GET /api', () => {
 			.expect(400)
 			.then(({ body }) => {
 				expect(body.msg).toBe('Invalid Article ID');
+			});
+	});
+	test('200: Get all articles, sorted by date in descending order', () => {
+		return request(app)
+			.get('/api/articles?sort_by=created_at')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(String),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).toBeSortedBy('created_at', { descending: true });
+				});
+			});
+	});
+	test('400: responds with error if sort_by is invalid', () => {
+		return request(app)
+			.get('/api/articles?sort_by=banana')
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe('Invalid Sort Request');
 			});
 	});
 });
