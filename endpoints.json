@@ -76,5 +76,24 @@
 				}
 			]
 		}
+	},
+	"POST /api/articles/:article_id/comments": {
+		"description": "posts comment to relavant article, when an appropriate article_id, body and author are supplied",
+		"queries": ["article_id"],
+		"exampleResponse": {
+			"articles": [
+				{
+					"msg": "Comment Posted Successfully",
+					"comment": {
+						"comment_id": 19,
+						"article_id": 2,
+						"body": "First!!!!1!!one!one!!",
+						"votes": 0,
+						"author": "lurker",
+						"created_at": "2025-03-11T18:31:29.964Z"
+					}
+				}
+			]
+		}
 	}
 }

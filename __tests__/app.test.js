@@ -153,7 +153,7 @@ describe('GET /api', () => {
 				});
 			});
 	});
-	test('404: responds with error if sort_by is invalid', () => {
+	test('404: responds with error if article_id is not found', () => {
 		return request(app)
 			.get('/api/articles/9999/comments')
 			.expect(404)
@@ -167,6 +167,61 @@ describe('GET /api', () => {
 			.expect(400)
 			.then(({ body }) => {
 				expect(body.msg).toBe('Invalid Input');
+			});
+	});
+	test('200: responds if there are no comments yet for a valid article_id', () => {
+		return request(app)
+			.get('/api/articles/2/comments')
+			.expect(200)
+			.then(({ body }) => {
+				expect(body.msg).toBe('No Comments ... Yet!');
+			});
+	});
+});
+
+describe('POST /api', () => {
+	test('200: posts comment to correct article with correct values', () => {
+		const article_id = 2;
+		const body = 'First!!!!1!!one!one!!';
+		const author = 'lurker';
+		return request(app)
+			.post(`/api/articles/${article_id}/comments`)
+			.send({ body, author })
+			.expect(201)
+			.then(({ body: responseBody }) => {
+				expect(responseBody.msg).toBe('Comment Posted Successfully');
+				expect(responseBody.comment).toHaveProperty('article_id', article_id);
+				expect(responseBody.comment).toHaveProperty('body', body);
+				expect(responseBody.comment).toHaveProperty('author', author);
+				expect(responseBody.comment).toHaveProperty('created_at');
+
+				return db
+					.query(`SELECT * from comments WHERE article_id= $1;`, [article_id])
+					.then(({ rows }) => {
+						expect(rows.length).toBe(1);
+						expect(rows[0].body).toBe(body);
+						expect(rows[0].created_at.toISOString()).toMatch(
+							/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+						);
+					});
+			});
+	});
+
+	test('404: responds with error if article not found', () => {
+		return request(app)
+			.post('/api/articles/9999/comments')
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe('Article Not Found');
+			});
+	});
+
+	test('400: responds with error if invalid article_id (not a number)', () => {
+		return request(app)
+			.post('/api/articles/bananas/comments')
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe('Bad Request: article_id must be a number');
 			});
 	});
 });
