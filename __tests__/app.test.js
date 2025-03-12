@@ -269,7 +269,7 @@ describe('POST /api', () => {
 	});
 });
 
-describe.only('PATCH /api', () => {
+describe('PATCH /api', () => {
 	test('202: patches an article successfully with the correct number of votes when positive', async () => {
 		const article_id = 4;
 		const newVotes = 50;
@@ -331,5 +331,45 @@ describe.only('PATCH /api', () => {
 			.then(({ body }) => {
 				expect(body.msg).toBe('Bad Request');
 			});
+	});
+});
+
+describe('DELETE /api', () => {
+	test('204: successfully removes a comment by comment_id', async () => {
+		const comment_id = 3;
+		try {
+			const deletedComment = await request(app)
+				.delete(`/api/comments/${comment_id}`)
+				.expect(204);
+			const { rows } = await db.query(
+				`SELECT * from comments WHERE comment_id = $1`,
+				[comment_id]
+			);
+			expect(rows.length).toBe(0);
+		} catch (err) {
+			throw err;
+		}
+	});
+	test('400: returns error if comment_id is invalid (not a number)', async () => {
+		const comment_id = 'banana';
+		try {
+			const { body } = await request(app)
+				.delete(`/api/comments/${comment_id}`)
+				.expect(400);
+			expect(body.msg).toBe('Bad Request');
+		} catch (err) {
+			throw err;
+		}
+	});
+	test(`404: returns error if comment_id is valid but comment doesn't exist`, async () => {
+		const comment_id = 999999;
+		try {
+			const { body } = await request(app)
+				.delete(`/api/comments/${comment_id}`)
+				.expect(404);
+			expect(body.msg).toBe('Not Found');
+		} catch (err) {
+			throw err;
+		}
 	});
 });
