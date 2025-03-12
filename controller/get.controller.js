@@ -64,17 +64,12 @@ exports.getArticleComments = (request, response, next) => {
 exports.addArticleComment = (request, response, next) => {
 	const { article_id } = request.params;
 	const { body, author } = request.body;
-	if (isNaN(article_id)) {
-		return response
-			.status(400)
-			.send({ msg: 'Bad Request: article_id must be a number' });
-	}
 
 	postArticleComment(article_id, body, author)
 		.then((comment) => {
 			if (!comment || !comment.msg || !comment.comment) {
 				return response.status(500).send({
-					msg: 'Internal Server Error: Failed to post comment',
+					msg: 'Internal Server Error',
 				});
 			}
 
@@ -83,7 +78,5 @@ exports.addArticleComment = (request, response, next) => {
 				comment: comment.comment,
 			});
 		})
-		.catch((err) => {
-			next(err);
-		});
+		.catch(next);
 };

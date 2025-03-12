@@ -89,7 +89,7 @@ describe('GET /api', () => {
 			.get('/api/articles/bananas')
 			.expect(400)
 			.then(({ body }) => {
-				expect(body.msg).toBe('Invalid Input');
+				expect(body.msg).toBe('Bad Request');
 			});
 	});
 	test('200: Get all articles, sorted by date in descending order', () => {
@@ -180,7 +180,7 @@ describe('GET /api', () => {
 });
 
 describe('POST /api', () => {
-	test('200: posts comment to correct article with correct values', () => {
+	test('201: posts comment to correct article with correct values', () => {
 		const article_id = 2;
 		const body = 'First!!!!1!!one!one!!';
 		const author = 'lurker';
@@ -200,6 +200,7 @@ describe('POST /api', () => {
 					.then(({ rows }) => {
 						expect(rows.length).toBe(1);
 						expect(rows[0].body).toBe(body);
+						expect(rows[0].article_id).toBe(2);
 						expect(rows[0].created_at.toISOString()).toMatch(
 							/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
 						);
@@ -207,9 +208,51 @@ describe('POST /api', () => {
 			});
 	});
 
-	test('404: responds with error if article not found', () => {
+	test('201: ignores unnecessary properties on comment request body', () => {
+		const article_id = 2;
+		const validComment = {
+			body: 'First!!!!1!!one!one!!',
+			author: 'lurker',
+			unnecessaryProperty: 'spong-wiggidy!',
+		};
 		return request(app)
-			.post('/api/articles/9999/comments')
+			.post(`/api/articles/${article_id}/comments`)
+			.send(validComment)
+			.expect(201)
+			.then(({ body: responseBody }) => {
+				expect(responseBody.msg).toBe('Comment Posted Successfully');
+				expect(responseBody.comment).toHaveProperty('article_id', article_id);
+				expect(responseBody.comment).toHaveProperty('body', validComment.body);
+				expect(responseBody.comment).toHaveProperty(
+					'author',
+					validComment.author
+				);
+				expect(responseBody.comment).toHaveProperty('created_at');
+				expect(responseBody.comment).not.toHaveProperty('unnecessaryProperty');
+			});
+	});
+
+	test("404: responds with error when posting a comment from username that doesn't exist", () => {
+		const article_id = 2;
+		const invalidUserComment = {
+			body: 'I can write NEthing here. Phear me.',
+			author: 'AMitchInTimeSavesNine',
+		};
+		return request(app)
+			.post(`/api/articles/${article_id}/comments`)
+			.send(invalidUserComment)
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe('User Not Found');
+			});
+	});
+
+	test('404: responds with error if article not found', () => {
+		const body = 'First!!!!1!!one!one!!';
+		const author = 'lurker';
+		return request(app)
+			.post('/api/articles/999999999/comments')
+			.send({ body, author })
 			.expect(404)
 			.then(({ body }) => {
 				expect(body.msg).toBe('Article Not Found');
@@ -221,7 +264,7 @@ describe('POST /api', () => {
 			.post('/api/articles/bananas/comments')
 			.expect(400)
 			.then(({ body }) => {
-				expect(body.msg).toBe('Bad Request: article_id must be a number');
+				expect(body.msg).toBe('Bad Request');
 			});
 	});
 });

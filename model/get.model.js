@@ -81,6 +81,9 @@ exports.fetchCommentsByArticleId = (article_id) => {
 };
 
 exports.postArticleComment = (article_id, body, username) => {
+	if (!body || !username) {
+		return Promise.reject({ status: 400, msg: 'Bad Request' });
+	}
 	const articleQuery = `
 	SELECT title, author
 	FROM articles
@@ -89,6 +92,7 @@ exports.postArticleComment = (article_id, body, username) => {
 	return db
 		.query(articleQuery, [article_id])
 		.then(({ rows }) => {
+			console.log('rows from model', rows);
 			if (rows.length === 0) {
 				return Promise.reject({ status: 404, msg: 'Article Not Found' });
 			}
@@ -108,8 +112,6 @@ exports.postArticleComment = (article_id, body, username) => {
 			return { msg: 'Comment Posted Successfully', comment: rows[0] };
 		})
 		.catch((err) => {
-			const status = err.status || 500;
-			const msg = err.msg || 'Internal Server Error';
-			return Promise.reject({ status, msg });
+			return Promise.reject(err);
 		});
 };
