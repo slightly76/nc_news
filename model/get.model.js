@@ -13,18 +13,19 @@ exports.fetchAllTopics = () => {
 	});
 };
 
-exports.fetchArticleById = (id) => {
-	return db
-		.query('SELECT * FROM articles WHERE article_id = $1;', [id])
-		.then(({ rows }) => {
-			if (rows.length === 0) {
-				return Promise.reject({
-					status: 404,
-					msg: 'Article Not Found',
-				});
-			}
-			return rows[0];
-		});
+exports.fetchArticleById = async (id) => {
+	try {
+		const { rows } = await db.query(
+			'SELECT * FROM articles WHERE article_id = $1;',
+			[id]
+		);
+		if (rows.length === 0) {
+			throw { status: 404, msg: 'Article Not Found' };
+		}
+		return rows[0];
+	} catch (err) {
+		throw err;
+	}
 };
 
 exports.fetchArticlesSortedBy = (sortBy = 'created_at') => {
@@ -92,7 +93,6 @@ exports.postArticleComment = (article_id, body, username) => {
 	return db
 		.query(articleQuery, [article_id])
 		.then(({ rows }) => {
-			console.log('rows from model', rows);
 			if (rows.length === 0) {
 				return Promise.reject({ status: 404, msg: 'Article Not Found' });
 			}
@@ -114,4 +114,27 @@ exports.postArticleComment = (article_id, body, username) => {
 		.catch((err) => {
 			return Promise.reject(err);
 		});
+};
+
+exports.patchArticleById = async (article_id, body) => {
+	try {
+		if (!body.inc_votes && body.inc_votes !== 0) {
+			throw { status: 400, msg: 'Bad Request' };
+		}
+		const articleToUpdate = await exports.fetchArticleById(article_id);
+		if (!articleToUpdate) {
+			throw { status: 404, msg: 'Article Not Found' };
+		}
+		const newVotes = body.inc_votes;
+		if (isNaN(newVotes)) {
+			throw { status: 400, msg: 'Bad Request' };
+		}
+		const { rows } = await db.query(
+			`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
+			[newVotes, article_id]
+		);
+		return rows[0];
+	} catch (err) {
+		throw err;
+	}
 };

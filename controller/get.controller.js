@@ -5,6 +5,7 @@ const {
 	fetchArticlesSortedBy,
 	fetchCommentsByArticleId,
 	postArticleComment,
+	patchArticleById,
 } = require('../model/get.model.js');
 
 exports.getEndpoints = (request, response) => {
@@ -79,4 +80,17 @@ exports.addArticleComment = (request, response, next) => {
 			});
 		})
 		.catch(next);
+};
+
+exports.updateArticleById = async (request, response, next) => {
+	const { article_id } = request.params;
+	const body = request.body;
+	try {
+		const updatedArticle = await patchArticleById(article_id, body);
+		response
+			.status(202)
+			.send({ msg: 'Votes Updated Successfully', article: updatedArticle });
+	} catch (err) {
+		next(err);
+	}
 };
