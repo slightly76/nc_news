@@ -10,7 +10,7 @@ beforeAll(() => seed(data));
 afterAll(() => db.end());
 
 describe('GET /api', () => {
-	test('200: Responds with an object detailing the documentation for each endpoint', () => {
+	test('200: /api Responds with an object detailing the documentation for each endpoint', () => {
 		return request(app)
 			.get('/api')
 			.expect(200)
@@ -18,7 +18,7 @@ describe('GET /api', () => {
 				expect(endpoints).toEqual(endpointsJson);
 			});
 	});
-	test('200: Responds with an array of all topics', () => {
+	test('200: /api/topics Responds with an array of all topics', () => {
 		return request(app)
 			.get('/api/topics')
 			.expect(200)
@@ -53,7 +53,7 @@ describe('GET /api', () => {
 				]);
 			});
 	});
-	test('200: Get articles by article_id', () => {
+	test('200: /api/articles/:article_id Get articles by article_id', () => {
 		return request(app)
 			.get('/api/articles/3')
 			.expect(200)
@@ -76,7 +76,7 @@ describe('GET /api', () => {
 				});
 			});
 	});
-	test('404: responds with an error when article_id does not exist', () => {
+	test('404: /api/articles/article_id Responds with an error when article_id does not exist', () => {
 		return request(app)
 			.get('/api/articles/9999')
 			.expect(404)
@@ -84,7 +84,7 @@ describe('GET /api', () => {
 				expect(body.msg).toBe('Article Not Found');
 			});
 	});
-	test('400: responds with an error for invalid article_id (not a number)', () => {
+	test('400: /api/articles/article_id Responds with an error for invalid article_id (not a number)', () => {
 		return request(app)
 			.get('/api/articles/bananas')
 			.expect(400)
@@ -92,7 +92,7 @@ describe('GET /api', () => {
 				expect(body.msg).toBe('Bad Request');
 			});
 	});
-	test('200: Get all articles, sorted by date in descending order', () => {
+	test('200: /api/articles Get all articles, sorted by date in descending order', () => {
 		return request(app)
 			.get('/api/articles?sort_by=created_at')
 			.expect(200)
@@ -119,7 +119,7 @@ describe('GET /api', () => {
 				});
 			});
 	});
-	test('400: responds with error if sort_by is invalid', () => {
+	test('400: /api/articles responds with error if sort_by is invalid', () => {
 		return request(app)
 			.get('/api/articles?sort_by=banana')
 			.expect(400)
@@ -127,7 +127,7 @@ describe('GET /api', () => {
 				expect(body.msg).toBe('Invalid Sort Request');
 			});
 	});
-	test('200: Get all comments, sorted by created_at in descending order', () => {
+	test('200: /api/articles/:article_id/comments Get all comments, sorted by created_at in descending order', () => {
 		return request(app)
 			.get('/api/articles/1/comments')
 			.expect(200)
@@ -153,7 +153,7 @@ describe('GET /api', () => {
 				});
 			});
 	});
-	test('404: responds with error if article_id is not found', () => {
+	test('404: /api/articles/:article_id/comments Responds with error if article_id is not found', () => {
 		return request(app)
 			.get('/api/articles/9999/comments')
 			.expect(404)
@@ -161,7 +161,7 @@ describe('GET /api', () => {
 				expect(body.msg).toBe('Article Not Found');
 			});
 	});
-	test('400: responds with an error for invalid article_id (not a number)', () => {
+	test('400: /api/articles/:article_id/comments Responds with an error for invalid article_id (not a number)', () => {
 		return request(app)
 			.get('/api/articles/bananas/comments')
 			.expect(400)
@@ -169,7 +169,7 @@ describe('GET /api', () => {
 				expect(body.msg).toBe('Invalid Input');
 			});
 	});
-	test('200: responds if there are no comments yet for a valid article_id', () => {
+	test('200: /api/articles/article_id/comments Responds if there are no comments yet for a valid article_id', () => {
 		return request(app)
 			.get('/api/articles/2/comments')
 			.expect(200)
@@ -180,7 +180,7 @@ describe('GET /api', () => {
 });
 
 describe('POST /api', () => {
-	test('201: posts comment to correct article with correct values', () => {
+	test('201: /api/articles/:article_id/comments Posts comment to correct article with correct values', () => {
 		const article_id = 2;
 		const body = 'First!!!!1!!one!one!!';
 		const author = 'lurker';
@@ -208,7 +208,7 @@ describe('POST /api', () => {
 			});
 	});
 
-	test('201: ignores unnecessary properties on comment request body', () => {
+	test('201: /api/articles/:article_id/comments Ignores unnecessary properties on comment request body', () => {
 		const article_id = 2;
 		const validComment = {
 			body: 'First!!!!1!!one!one!!',
@@ -232,7 +232,7 @@ describe('POST /api', () => {
 			});
 	});
 
-	test("404: responds with error when posting a comment from username that doesn't exist", () => {
+	test("404: /api/articles/article_id/comments Responds with error when posting a comment from username that doesn't exist", () => {
 		const article_id = 2;
 		const invalidUserComment = {
 			body: 'I can write NEthing here. Phear me.',
@@ -247,7 +247,7 @@ describe('POST /api', () => {
 			});
 	});
 
-	test('404: responds with error if article not found', () => {
+	test('404: /api/articles/:article_id/comments Responds with error if article not found', () => {
 		const body = 'First!!!!1!!one!one!!';
 		const author = 'lurker';
 		return request(app)
@@ -259,7 +259,7 @@ describe('POST /api', () => {
 			});
 	});
 
-	test('400: responds with error if invalid article_id (not a number)', () => {
+	test('400:/api/articles/article_id/comments Responds with error if invalid article_id (not a number)', () => {
 		return request(app)
 			.post('/api/articles/bananas/comments')
 			.expect(400)
@@ -269,8 +269,8 @@ describe('POST /api', () => {
 	});
 });
 
-describe.only('PATCH /api', () => {
-	test('202: patches an article successfully with the correct number of votes when positive', async () => {
+describe('PATCH /api', () => {
+	test('202: /api/articles/:article_id Patches an article successfully with the correct number of votes when positive', async () => {
 		const article_id = 4;
 		const newVotes = 50;
 		try {
@@ -286,7 +286,7 @@ describe.only('PATCH /api', () => {
 			throw err;
 		}
 	});
-	test('400: responds with error when no inc_votes value is provided', async () => {
+	test('400: /api/articles/:article_id Responds with error when no inc_votes value is provided', async () => {
 		const article_id = 1;
 		try {
 			const { body: responseBody } = await request(app)
@@ -298,7 +298,7 @@ describe.only('PATCH /api', () => {
 			throw err;
 		}
 	});
-	test('404: responds with error if article not found', async () => {
+	test('404: /api/articles/:article_id Responds with error if article not found', async () => {
 		const article_id = 9999999;
 		const newVotes = 50;
 		try {
@@ -311,7 +311,7 @@ describe.only('PATCH /api', () => {
 			throw err;
 		}
 	});
-	test('400: responds with error if invalid article_id (not a number)', () => {
+	test('400: /api/articles/:article_id Responds with error if invalid article_id (not a number)', () => {
 		const article_id = 'banana';
 		const newVotes = 99;
 		return request(app)
@@ -322,7 +322,7 @@ describe.only('PATCH /api', () => {
 			});
 	});
 
-	test('400: responds with error if newVote is not a number', () => {
+	test('400: /api/articles/:article_id Responds with error if newVote is not a number', () => {
 		const article_id = 3;
 		const newVotes = 'banana';
 		return request(app)
@@ -331,5 +331,45 @@ describe.only('PATCH /api', () => {
 			.then(({ body }) => {
 				expect(body.msg).toBe('Bad Request');
 			});
+	});
+});
+
+describe('DELETE /api', () => {
+	test('204: /api/comments/:comment_id Successfully removes a comment by comment_id', async () => {
+		const comment_id = 3;
+		try {
+			const deletedComment = await request(app)
+				.delete(`/api/comments/${comment_id}`)
+				.expect(204);
+			const { rows } = await db.query(
+				`SELECT * from comments WHERE comment_id = $1`,
+				[comment_id]
+			);
+			expect(rows.length).toBe(0);
+		} catch (err) {
+			throw err;
+		}
+	});
+	test('400: /api/comments/:comment_id Returns error if comment_id is invalid (not a number)', async () => {
+		const comment_id = 'banana';
+		try {
+			const { body } = await request(app)
+				.delete(`/api/comments/${comment_id}`)
+				.expect(400);
+			expect(body.msg).toBe('Bad Request');
+		} catch (err) {
+			throw err;
+		}
+	});
+	test(`404: /api/comments/:comment_id Returns error if comment_id is valid but comment doesn't exist`, async () => {
+		const comment_id = 999999;
+		try {
+			const { body } = await request(app)
+				.delete(`/api/comments/${comment_id}`)
+				.expect(404);
+			expect(body.msg).toBe('Not Found');
+		} catch (err) {
+			throw err;
+		}
 	});
 });

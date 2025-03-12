@@ -8,6 +8,7 @@ const {
 	getArticleComments,
 	addArticleComment,
 	updateArticleById,
+	deleteCommentById,
 } = require('./controller/get.controller.js');
 
 const {
@@ -28,31 +29,18 @@ app.get('/api/articles', getArticlesSortedBy);
 
 app.get('/api/articles/:article_id/comments', getArticleComments);
 
+// app.get(`/api/users`, getAllUsers);
+
 app.post('/api/articles/:article_id/comments', addArticleComment);
 
 app.patch('/api/articles/:article_id', updateArticleById);
+
+app.delete('/api/comments/:comment_id', deleteCommentById);
 
 app.use(psqlErrorHandler);
 
 app.use(customErrorHandler);
 
 app.use(serverErrorHandler);
-
-// app.use((err, request, response, next) => {
-// 	if (err.status) {
-// 		response.status(err.status).send({ msg: err.msg });
-// 	} else next(err);
-// });
-
-// app.use((err, request, response, next) => {
-// 	if (err.code === '22P02') {
-// 		response.status(400).send({ msg: 'Invalid Input' });
-// 	} else next(err);
-// });
-
-// app.use((err, request, response, next) => {
-// 	console.log(err);
-// 	response.status(500).send({ msg: 'Internal Server Error' });
-// });
 
 module.exports = app;
