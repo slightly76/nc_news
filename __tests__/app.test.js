@@ -268,3 +268,68 @@ describe('POST /api', () => {
 			});
 	});
 });
+
+describe.only('PATCH /api', () => {
+	test('202: patches an article successfully with the correct number of votes when positive', async () => {
+		const article_id = 4;
+		const newVotes = 50;
+		try {
+			const { body: responseBody } = await request(app)
+				.patch(`/api/articles/${article_id}`)
+				.send({ inc_votes: newVotes })
+				.expect(202);
+			expect(responseBody).toHaveProperty('article');
+			expect(responseBody.article).toHaveProperty('votes');
+			expect(responseBody.msg).toBe('Votes Updated Successfully');
+			expect(responseBody.article.votes).toBe(50);
+		} catch (err) {
+			throw err;
+		}
+	});
+	test('400: responds with error when no inc_votes value is provided', async () => {
+		const article_id = 1;
+		try {
+			const { body: responseBody } = await request(app)
+				.patch(`/api/articles/${article_id}`)
+				.send({});
+			expect(400);
+			expect(responseBody.msg).toBe('Bad Request');
+		} catch (err) {
+			throw err;
+		}
+	});
+	test('404: responds with error if article not found', async () => {
+		const article_id = 9999999;
+		const newVotes = 50;
+		try {
+			const { body: responseBody } = await request(app)
+				.patch(`/api/articles/${article_id}`)
+				.send({ inc_votes: newVotes });
+			expect(404);
+			expect(responseBody.msg).toBe('Article Not Found');
+		} catch (err) {
+			throw err;
+		}
+	});
+	test('400: responds with error if invalid article_id (not a number)', () => {
+		const article_id = 'banana';
+		const newVotes = 99;
+		return request(app)
+			.patch(`/api/articles/${article_id}`)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe('Bad Request');
+			});
+	});
+
+	test('400: responds with error if newVote is not a number', () => {
+		const article_id = 3;
+		const newVotes = 'banana';
+		return request(app)
+			.patch(`/api/articles/${article_id}`)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe('Bad Request');
+			});
+	});
+});

@@ -18,6 +18,5 @@ exports.psqlErrorHandler = (err, request, response, next) => {
 };
 
 exports.serverErrorHandler = (err, request, result, next) => {
-	console.error(err);
 	result.status(500).send({ msg: 'Internal Server Error' });
 };

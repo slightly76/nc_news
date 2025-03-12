@@ -7,6 +7,7 @@ const {
 	getArticlesSortedBy,
 	getArticleComments,
 	addArticleComment,
+	updateArticleById,
 } = require('./controller/get.controller.js');
 
 const {
@@ -28,6 +29,8 @@ app.get('/api/articles', getArticlesSortedBy);
 app.get('/api/articles/:article_id/comments', getArticleComments);
 
 app.post('/api/articles/:article_id/comments', addArticleComment);
+
+app.patch('/api/articles/:article_id', updateArticleById);
 
 app.use(psqlErrorHandler);
 
