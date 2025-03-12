@@ -278,6 +278,7 @@ describe.only('PATCH /api', () => {
 				.patch(`/api/articles/${article_id}`)
 				.send({ inc_votes: newVotes })
 				.expect(202);
+			console.log(responseBody);
 			expect(responseBody).toHaveProperty('article');
 			expect(responseBody.article).toHaveProperty('votes');
 			expect(responseBody.msg).toBe('Votes Updated Successfully');
