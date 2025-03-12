@@ -6,6 +6,7 @@ const {
 	fetchCommentsByArticleId,
 	postArticleComment,
 	patchArticleById,
+	removeCommentById,
 } = require('../model/get.model.js');
 
 exports.getEndpoints = (request, response) => {
@@ -90,6 +91,16 @@ exports.updateArticleById = async (request, response, next) => {
 		response
 			.status(202)
 			.send({ msg: 'Votes Updated Successfully', article: updatedArticle });
+	} catch (err) {
+		next(err);
+	}
+};
+
+exports.deleteCommentById = async (request, response, next) => {
+	const { comment_id } = request.params;
+	try {
+		await removeCommentById(comment_id);
+		response.status(204).send();
 	} catch (err) {
 		next(err);
 	}
