@@ -82,6 +82,7 @@ describe('GET /api', () => {
 					votes: 0,
 					article_img_url:
 						'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+					comment_count: expect.any(Number),
 				});
 			});
 	});
@@ -385,6 +386,30 @@ describe('GET /api', () => {
 				});
 			});
 	});
+	test('200: /api/articles:article_id also responds with comment count', () => {
+		return request(app)
+			.get('/api/articles/3')
+			.expect(200)
+			.then(({ body: { article } }) => {
+				expect(article).toBeInstanceOf(Object);
+				expect(article.created_at).toMatch(
+					/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+				);
+
+				expect(article).toEqual({
+					article_id: 3,
+					title: 'Eight pug gifs that remind me of mitch',
+					topic: 'mitch',
+					author: 'icellusedkars',
+					body: 'some gifs',
+					created_at: '2020-11-03T09:12:00.000Z',
+					votes: 0,
+					article_img_url:
+						'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+					comment_count: expect.any(Number),
+				});
+			});
+	});
 	test('404: /api/articles/:article_id/comments Responds with error if article_id is not found', () => {
 		return request(app)
 			.get('/api/articles/9999/comments')
@@ -409,6 +434,7 @@ describe('GET /api', () => {
 				expect(body.msg).toBe('No Comments ... Yet!');
 			});
 	});
+
 	test('200: /api/users Returns all users', async () => {
 		try {
 			const {

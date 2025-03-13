@@ -13,12 +13,23 @@ exports.fetchAllTopics = () => {
 	});
 };
 
-exports.fetchArticleById = async (id) => {
+exports.fetchArticleById = async (article_id) => {
 	try {
-		const { rows } = await db.query(
-			'SELECT * FROM articles WHERE article_id = $1;',
-			[id]
-		);
+		const queryString = `SELECT 
+    articles.article_id, 
+    articles.title, 
+    articles.topic, 
+    articles.author, 
+	articles.body,
+    articles.created_at, 
+    articles.votes, 
+    articles.article_img_url,
+    CAST(COUNT(comments.comment_id) AS INT) AS comment_count
+FROM articles
+LEFT JOIN comments ON comments.article_id = articles.article_id
+WHERE articles.article_id = $1
+GROUP BY articles.article_id;`;
+		const { rows } = await db.query(queryString, [article_id]);
 		if (rows.length === 0) {
 			throw { status: 404, msg: 'Article Not Found' };
 		}
@@ -54,7 +65,7 @@ exports.fetchArticlesSortedBy = async (
 	let queryString = `
 		SELECT articles.article_id, articles.title, articles.topic, articles.author, 
 		articles.created_at, articles.votes, articles.article_img_url,
-		CAST(COUNT (comments.comment_id) AS INT)	 AS comment_count
+		CAST(COUNT(comments.comment_id) AS INT) AS comment_count
 		FROM articles
 		LEFT JOIN comments ON comments.article_id = articles.article_id`;
 
