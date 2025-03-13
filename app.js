@@ -9,12 +9,14 @@ const {
 	addArticleComment,
 	updateArticleById,
 	deleteCommentById,
+	getAllUsers,
 } = require('./controller/get.controller.js');
 
 const {
 	psqlErrorHandler,
 	customErrorHandler,
 	serverErrorHandler,
+	notFoundErrorHandler,
 } = require('./errorHandlers.js');
 
 app.use(express.json());
@@ -29,7 +31,7 @@ app.get('/api/articles', getArticlesSortedBy);
 
 app.get('/api/articles/:article_id/comments', getArticleComments);
 
-// app.get(`/api/users`, getAllUsers);
+app.get(`/api/users`, getAllUsers);
 
 app.post('/api/articles/:article_id/comments', addArticleComment);
 
@@ -42,5 +44,7 @@ app.use(psqlErrorHandler);
 app.use(customErrorHandler);
 
 app.use(serverErrorHandler);
+
+app.use(notFoundErrorHandler);
 
 module.exports = app;

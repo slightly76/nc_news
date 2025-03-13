@@ -5,6 +5,7 @@ const data = require('../db/data/test-data/index');
 const request = require('supertest');
 const app = require('../app.js');
 require('jest-sorted');
+const { fetchAllUsers } = require('../model/get.model.js');
 
 beforeAll(() => seed(data));
 afterAll(() => db.end());
@@ -17,6 +18,14 @@ describe('GET /api', () => {
 			.then(({ body: { endpoints } }) => {
 				expect(endpoints).toEqual(endpointsJson);
 			});
+	});
+	test('404: Responds with error for an invalid endpoint', async () => {
+		try {
+			const response = await request(app).get('/api/nonexistent').expect(404);
+			expect(response.body.msg).toBe('Not Found');
+		} catch (err) {
+			throw err;
+		}
 	});
 	test('200: /api/topics Responds with an array of all topics', () => {
 		return request(app)
@@ -177,6 +186,25 @@ describe('GET /api', () => {
 				expect(body.msg).toBe('No Comments ... Yet!');
 			});
 	});
+	test('200: /api/users Returns all users', async () => {
+		try {
+			const {
+				body: { users },
+			} = await request(app).get(`/api/users`).expect(200);
+			expect(users).toBeInstanceOf(Object);
+			users.forEach((user) => {
+				expect(user).toEqual(
+					expect.objectContaining({
+						username: expect.any(String),
+						name: expect.any(String),
+						avatar_url: expect.any(String),
+					})
+				);
+			});
+		} catch (err) {
+			throw err;
+		}
+	});
 });
 
 describe('POST /api', () => {
@@ -301,15 +329,11 @@ describe('PATCH /api', () => {
 	test('404: /api/articles/:article_id Responds with error if article not found', async () => {
 		const article_id = 9999999;
 		const newVotes = 50;
-		try {
-			const { body: responseBody } = await request(app)
-				.patch(`/api/articles/${article_id}`)
-				.send({ inc_votes: newVotes });
-			expect(404);
-			expect(responseBody.msg).toBe('Article Not Found');
-		} catch (err) {
-			throw err;
-		}
+		const { body: responseBody } = await request(app)
+			.patch(`/api/articles/${article_id}`)
+			.send({ inc_votes: newVotes });
+		expect(404);
+		expect(responseBody.msg).toBe('Article Not Found');
 	});
 	test('400: /api/articles/:article_id Responds with error if invalid article_id (not a number)', () => {
 		const article_id = 'banana';
@@ -337,18 +361,14 @@ describe('PATCH /api', () => {
 describe('DELETE /api', () => {
 	test('204: /api/comments/:comment_id Successfully removes a comment by comment_id', async () => {
 		const comment_id = 3;
-		try {
-			const deletedComment = await request(app)
-				.delete(`/api/comments/${comment_id}`)
-				.expect(204);
-			const { rows } = await db.query(
-				`SELECT * from comments WHERE comment_id = $1`,
-				[comment_id]
-			);
-			expect(rows.length).toBe(0);
-		} catch (err) {
-			throw err;
-		}
+		const deletedComment = await request(app)
+			.delete(`/api/comments/${comment_id}`)
+			.expect(204);
+		const { rows } = await db.query(
+			`SELECT * from comments WHERE comment_id = $1`,
+			[comment_id]
+		);
+		expect(rows.length).toBe(0);
 	});
 	test('400: /api/comments/:comment_id Returns error if comment_id is invalid (not a number)', async () => {
 		const comment_id = 'banana';
