@@ -37,9 +37,13 @@ exports.getArticleById = (request, response, next) => {
 };
 
 exports.getArticlesSortedBy = (request, response, next) => {
-	const { sort_by } = request.query;
-	console.log(sort_by);
-	fetchArticlesSortedBy(sort_by)
+	const { sort_by, topic, order } = request.query;
+	const sortBy = sort_by || 'created_at';
+	const orderBy =
+		order && ['ASC', 'DESC'].includes(order.toUpperCase()) ? order : 'DESC';
+	const topicFilter = topic || null;
+
+	fetchArticlesSortedBy(sortBy, orderBy, topicFilter)
 		.then((articles) => {
 			response.status(200).send({ articles });
 		})
@@ -63,6 +67,12 @@ exports.getArticleComments = (request, response, next) => {
 		.catch((err) => {
 			next(err);
 		});
+};
+
+exports.getArticlesByTopic = async (request, response, next) => {
+	const { topic } = request.query;
+
+	fetchArticlesSortedBy(sort_by, topic);
 };
 
 exports.addArticleComment = (request, response, next) => {

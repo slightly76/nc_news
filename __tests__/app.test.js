@@ -428,6 +428,67 @@ describe('GET /api', () => {
 			throw err;
 		}
 	});
+	test('200: returns array of article objects filtered by topic', async () => {
+		return request(app)
+			.get('/api/articles?topic=cats')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article.topic).toBe('cats');
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+				});
+			});
+	});
+	test('200: if not topic is not given, list all articles', async () => {
+		return request(app)
+			.get('/api/articles?topic=')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							topic: expect.any(String),
+							article_id: expect.any(Number),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+				});
+			});
+	});
+	test('404: returns an error if the topic is not found', async () => {
+		return request(app)
+			.get('/api/articles?topic=banana')
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe('Topic Not Found');
+				expect(Array.isArray(body.articles)).toBe(false);
+			});
+	});
 });
 
 describe('POST /api', () => {

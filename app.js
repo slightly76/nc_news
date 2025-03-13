@@ -10,6 +10,7 @@ const {
 	updateArticleById,
 	deleteCommentById,
 	getAllUsers,
+	getArticlesByTopic,
 } = require('./controller/get.controller.js');
 
 const {
@@ -32,6 +33,8 @@ app.get('/api/articles', getArticlesSortedBy);
 app.get('/api/articles/:article_id/comments', getArticleComments);
 
 app.get(`/api/users`, getAllUsers);
+
+app.get(`/api/articles`, getArticlesByTopic);
 
 app.post('/api/articles/:article_id/comments', addArticleComment);
 
