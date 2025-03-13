@@ -38,6 +38,7 @@ exports.getArticleById = (request, response, next) => {
 
 exports.getArticlesSortedBy = (request, response, next) => {
 	const { sort_by } = request.query;
+	console.log(sort_by);
 	fetchArticlesSortedBy(sort_by)
 		.then((articles) => {
 			response.status(200).send({ articles });
@@ -102,7 +103,7 @@ exports.updateArticleById = async (request, response, next) => {
 	try {
 		const updatedArticle = await patchArticleById(article_id, body);
 		response
-			.status(202)
+			.status(200)
 			.send({ msg: 'Votes Updated Successfully', article: updatedArticle });
 	} catch (err) {
 		next(err);

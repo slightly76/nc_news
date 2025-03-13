@@ -28,7 +28,7 @@ exports.fetchArticleById = async (id) => {
 	}
 };
 
-exports.fetchArticlesSortedBy = (sortBy = 'created_at') => {
+exports.fetchArticlesSortedBy = (sortBy = 'created_at', order = 'DESC') => {
 	const validSortFields = [
 		'created_at',
 		'votes',
@@ -36,9 +36,14 @@ exports.fetchArticlesSortedBy = (sortBy = 'created_at') => {
 		'author',
 		'topic',
 		'article_id',
+		'article_img_url',
 	];
+	const validOrder = ['ASC', 'DESC'];
 	if (!validSortFields.includes(sortBy)) {
 		return Promise.reject({ status: 400, msg: 'Invalid Sort Request' });
+	}
+	if (!validOrder.includes(order.toUpperCase())) {
+		return Promise.reject({ status: 400, msg: 'Invalid Order Request' });
 	}
 	const queryString = `
 		SELECT articles.article_id, articles.title, articles.topic, articles.author, 
@@ -47,7 +52,7 @@ exports.fetchArticlesSortedBy = (sortBy = 'created_at') => {
 		FROM articles
 		LEFT JOIN comments ON comments.article_id = articles.article_id
 		GROUP BY articles.article_id
-		ORDER BY ${sortBy} DESC
+		ORDER BY ${sortBy} ${order.toUpperCase()}
 		;`;
 
 	return db.query(queryString).then(({ rows }) => {

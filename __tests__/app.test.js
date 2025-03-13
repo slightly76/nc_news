@@ -101,7 +101,7 @@ describe('GET /api', () => {
 				expect(body.msg).toBe('Bad Request');
 			});
 	});
-	test('200: /api/articles Get all articles, sorted by date in descending order', () => {
+	test('200: /api/articles Get all articles, sorted by created_at date in descending order', () => {
 		return request(app)
 			.get('/api/articles?sort_by=created_at')
 			.expect(200)
@@ -128,6 +128,229 @@ describe('GET /api', () => {
 				});
 			});
 	});
+	test('200: /api/articles Get all articles, sorted by article_id in descending order', async () => {
+		return request(app)
+			.get('/api/articles?sort_by=article_id')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+					expect(articles).toBeSortedBy('article_id', { descending: true });
+				});
+			});
+	});
+	test('200: /api/articles Get all articles, sorted by article title in descending order', async () => {
+		return request(app)
+			.get('/api/articles?sort_by=title')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+					expect(articles).toBeSortedBy('title', { descending: true });
+				});
+			});
+	});
+	test('200: /api/articles Get all articles, sorted by article topic in descending order', async () => {
+		return request(app)
+			.get('/api/articles?sort_by=topic')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+					expect(articles).toBeSortedBy('topic', { descending: true });
+				});
+			});
+	});
+	test('200: /api/articles Get all articles, sorted by article author in descending order', async () => {
+		return request(app)
+			.get('/api/articles?sort_by=author')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+					expect(articles).toBeSortedBy('author', { descending: true });
+				});
+			});
+	});
+	test('200: /api/articles Get all articles, sorted by article votes in descending order', async () => {
+		return request(app)
+			.get('/api/articles?sort_by=votes')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+					expect(articles).toBeSortedBy('votes', { descending: true });
+				});
+			});
+	});
+	test('200: /api/articles Get all articles, sorted by article_img_url in descending order', async () => {
+		return request(app)
+			.get('/api/articles?sort_by=article_img_url')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+					expect(articles).toBeSortedBy('article_img_url', {
+						descending: true,
+					});
+				});
+			});
+	});
+	test('200: /api/articles Get all articles, sorted by article_id in descending order when triggered', async () => {
+		return request(app)
+			.get('/api/articles?sort_by=article_img_url&order=DESC')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+					expect(articles).toBeSortedBy('article_img_url', {
+						descending: true,
+					});
+				});
+			});
+	});
+	test('200: /api/articles Get all articles, sorted by article_id in ascending order when triggered', async () => {
+		return request(app)
+			.get('/api/articles?sort_by=article_img_url&order=ASC')
+			.expect(200)
+			.then(({ body: { articles } }) => {
+				expect(Array.isArray(articles)).toBe(true);
+				expect(articles).not.toHaveLength(0);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+							comment_count: expect.any(Number),
+						})
+					);
+					expect(article.created_at).toMatch(
+						/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+					);
+					expect(articles).not.toHaveProperty('body');
+					expect(articles).toBeSortedBy('article_img_url', {
+						descending: true,
+					});
+				});
+			});
+	});
+
 	test('400: /api/articles responds with error if sort_by is invalid', () => {
 		return request(app)
 			.get('/api/articles?sort_by=banana')
@@ -305,7 +528,7 @@ describe('PATCH /api', () => {
 			const { body: responseBody } = await request(app)
 				.patch(`/api/articles/${article_id}`)
 				.send({ inc_votes: newVotes })
-				.expect(202);
+				.expect(200);
 			expect(responseBody).toHaveProperty('article');
 			expect(responseBody.article).toHaveProperty('votes');
 			expect(responseBody.msg).toBe('Votes Updated Successfully');
