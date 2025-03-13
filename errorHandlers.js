@@ -20,3 +20,7 @@ exports.psqlErrorHandler = (err, request, response, next) => {
 exports.serverErrorHandler = (err, request, result, next) => {
 	result.status(500).send({ msg: 'Internal Server Error' });
 };
+
+exports.notFoundErrorHandler = (req, res, next) => {
+	res.status(404).send({ msg: 'Not Found' });
+};

@@ -100,5 +100,19 @@
 		"description": "removes comment from the comments table when a valid comment_id is supplied",
 		"queries": ["comment_id"],
 		"exampleResponse": [{ "msg": "Comment Deneted Successfully" }]
+	},
+	"GET /api/users": {
+		"description": "serves an array of users",
+		"queries": [],
+		"exampleResponse": {
+			"users": [
+				{
+					"user_id": 1,
+					"username": "butter_bridge",
+					"name": "jonny",
+					"avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+				}
+			]
+		}
 	}
 }

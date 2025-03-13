@@ -140,30 +140,25 @@ exports.patchArticleById = async (article_id, body) => {
 };
 
 exports.removeCommentById = async (comment_id) => {
+	const { rows } = await db.query(
+		`SELECT * FROM comments WHERE comment_id = $1;`,
+		[comment_id]
+	);
+	if (rows.length === 0) {
+		throw { status: 404, msg: 'Not Found' };
+	}
+	await db.query(`DELETE FROM comments WHERE comment_id = $1;`, [comment_id]);
+	return { msg: 'Comment Deleted Successfully' };
+};
+
+exports.fetchAllUsers = async () => {
 	try {
-		const { rows } = await db.query(
-			`SELECT * FROM comments WHERE comment_id = $1;`,
-			[comment_id]
-		);
-		console.log('comment fetched in model ', rows);
+		const { rows } = await db.query(`SELECT * from users;`);
 		if (rows.length === 0) {
 			throw { status: 404, msg: 'Not Found' };
 		}
-		await db.query(`DELETE FROM comments WHERE comment_id = $1;`, [comment_id]);
-		return { msg: 'Comment Deleted Successfully' };
+		return rows;
 	} catch (err) {
 		throw err;
 	}
 };
-
-// exports.fetchAllUsers = async () => {
-// 	try {
-// 		const { rows } = await db.query(`SELECT * from users;`);
-// 		console.log('users from model', rows);
-// 		if (rows.length === 0) {
-// 			throw { status: 404, msg: ' Not Found' };
-// 		}
-// 	} catch (err) {
-// 		throw err;
-// 	}
-// };

@@ -7,6 +7,7 @@ const {
 	postArticleComment,
 	patchArticleById,
 	removeCommentById,
+	fetchAllUsers,
 } = require('../model/get.model.js');
 
 exports.getEndpoints = (request, response) => {
@@ -81,6 +82,18 @@ exports.addArticleComment = (request, response, next) => {
 			});
 		})
 		.catch(next);
+};
+
+exports.getAllUsers = async (request, response, next) => {
+	try {
+		const users = await fetchAllUsers();
+		if (users.length === 0) {
+			return response.status(404).send({ msg: 'Not Found' });
+		}
+		response.status(200).send({ users });
+	} catch (err) {
+		next(err);
+	}
 };
 
 exports.updateArticleById = async (request, response, next) => {
