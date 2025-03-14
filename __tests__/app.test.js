@@ -406,7 +406,7 @@ describe('GET /api', () => {
 					votes: 0,
 					article_img_url:
 						'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-					comment_count: expect.any(Number),
+					comment_count: 2,
 				});
 			});
 	});
@@ -454,7 +454,7 @@ describe('GET /api', () => {
 			throw err;
 		}
 	});
-	test('200: returns array of article objects filtered by topic', async () => {
+	test('200: /api/articles?topics Returns array of article objects filtered by topic', async () => {
 		return request(app)
 			.get('/api/articles?topic=cats')
 			.expect(200)
@@ -480,7 +480,7 @@ describe('GET /api', () => {
 				});
 			});
 	});
-	test('200: if not topic is not given, list all articles', async () => {
+	test('200: /api/articles?topics If not topic is not given, list all articles', async () => {
 		return request(app)
 			.get('/api/articles?topic=')
 			.expect(200)
@@ -506,6 +506,13 @@ describe('GET /api', () => {
 				});
 			});
 	});
+	test('200: /api/articles?topics Returns an empty array when a valid topic exists but has no articles', async () => {
+		const response = await request(app).get('/api/articles?topic=paper');
+
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({ articles: [] });
+	});
+
 	test('404: returns an error if the topic is not found', async () => {
 		return request(app)
 			.get('/api/articles?topic=banana')

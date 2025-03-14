@@ -70,13 +70,14 @@ exports.fetchArticlesSortedBy = async (
 		LEFT JOIN comments ON comments.article_id = articles.article_id`;
 
 	if (topic) {
-		const topicFilterQuery = `SELECT EXISTS (SELECT 1 from articles WHERE topic = $1);`;
+		//const topicFilterQuery = `SELECT * from topics WHERE slug = $1;`;
+		const topicFilterQuery = `SELECT * FROM topics WHERE slug = $1;`;
 		const topicResult = await db.query(topicFilterQuery, [topic]);
-		queryString += ` WHERE LOWER(articles.topic) = LOWER($1)`;
-		queryParams.push(topic);
-		if (!topicResult.rows[0].exists) {
+		if (topicResult.rows.length === 0) {
 			return Promise.reject({ status: 404, msg: 'Topic Not Found' });
 		}
+		queryString += ` WHERE LOWER(articles.topic) = LOWER($1)`;
+		queryParams.push(topic);
 	}
 
 	queryString += ` GROUP BY articles.article_id
@@ -87,7 +88,27 @@ exports.fetchArticlesSortedBy = async (
 	return articlesResult.rows;
 };
 
-exports.fetchCommentsByArticleId = (article_id) => {
+exports.fetchCommentsByArticleId = (
+	article_id,
+	sort_by = 'created_at',
+	order = 'DESC'
+) => {
+	const validSortFields = [
+		'comment_id',
+		'votes',
+		'created_at',
+		'author',
+		'body',
+	];
+	const validOrder = ['ASC', 'DESC'];
+
+	if (!validSortFields.includes(sort_by)) {
+		return Promise.reject({ status: 400, msg: 'Invalid Sort Request' });
+	}
+	if (!validOrder.includes(order.toUpperCase())) {
+		return Promise.reject({ status: 400, msg: 'Invalid Order Request' });
+	}
+
 	if (isNaN(Number(article_id))) {
 		return Promise.reject({ status: 400, msg: 'Invalid Input' });
 	}
