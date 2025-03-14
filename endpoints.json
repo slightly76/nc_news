@@ -111,7 +111,7 @@
 	"DELETE /api/comments/:comment_id": {
 		"description": "removes comment from the comments table when a valid comment_id is supplied",
 		"queries": ["comment_id"],
-		"exampleResponse": [{ "msg": "Comment Deneted Successfully" }]
+		"exampleResponse": [{ "msg": "Comment Deleted Successfully" }]
 	},
 	"GET /api/users": {
 		"description": "serves an array of users",
