@@ -30,13 +30,14 @@ app.get('/api/articles/:article_id', getArticleById);
 
 app.get('/api/articles', getArticlesSortedBy);
 
-app.get('/api/articles/:article_id/comments', getArticleComments);
+app
+	.route('/api/articles/:article_id/comments')
+	.get(getArticleComments)
+	.post(addArticleComment);
 
 app.get(`/api/users`, getAllUsers);
 
 app.get(`/api/articles`, getArticlesByTopic);
-
-app.post('/api/articles/:article_id/comments', addArticleComment);
 
 app.patch('/api/articles/:article_id', updateArticleById);
 

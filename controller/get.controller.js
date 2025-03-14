@@ -52,9 +52,10 @@ exports.getArticlesSortedBy = (request, response, next) => {
 		});
 };
 
-exports.getArticleComments = (request, response, next) => {
+exports.getArticleComments = async (request, response, next) => {
 	const { article_id } = request.params;
-	fetchCommentsByArticleId(article_id)
+	const { sort_by, order } = request.query;
+	fetchCommentsByArticleId(article_id, sort_by, order)
 		.then((comments) => {
 			if (comments.length === 0) {
 				return response.status(200).send({
@@ -70,9 +71,13 @@ exports.getArticleComments = (request, response, next) => {
 };
 
 exports.getArticlesByTopic = async (request, response, next) => {
-	const { topic } = request.query;
+	const { topic, sort_by, order } = request.query;
 
-	fetchArticlesSortedBy(sort_by, topic);
+	fetchArticlesSortedBy(sort_by, order, topic)
+		.then((articles) => {
+			res.status(200).send({ articles });
+		})
+		.catch(next);
 };
 
 exports.addArticleComment = (request, response, next) => {
