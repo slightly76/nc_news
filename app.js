@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const {
 	getEndpoints,
@@ -19,6 +20,8 @@ const {
 	serverErrorHandler,
 	notFoundErrorHandler,
 } = require('./errorHandlers.js');
+
+app.use(cors());
 
 app.use(express.json());
 
